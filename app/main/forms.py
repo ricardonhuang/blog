@@ -1,6 +1,13 @@
 #coding=utf-8
 '''
-Created on 2016Äê10ÔÂ19ÈÕ
+Created on 2016ï¿½ï¿½10ï¿½ï¿½19ï¿½ï¿½
 
 @author: huangning
 '''
+from flask import render_template
+from . import main
+
+
+@main.route('/')
+def index():
+    return render_template('index.html')
