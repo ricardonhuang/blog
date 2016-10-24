@@ -12,7 +12,7 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
-    FLASKY_MAIL_SENDER = 'Flasky Admin <flasky@example.com>'
+    FLASKY_MAIL_SENDER = 'Flasky Admin <xyz1234h@126.com>'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
     @staticmethod
     def init_app(app):
@@ -21,11 +21,11 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    MAIL_SERVER = 'smtp.googlemail.com'
-    MAIL_PORT = 587
+    MAIL_SERVER = 'smtp.126.com'
+    MAIL_PORT = 25
     MAIL_USE_TLS = True
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_USERNAME = 'xyz1234h@126.com'#os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = 'hnling2010'#os.environ.get('MAIL_PASSWORD')
     SQLALCHEMY_DATABASE_URI = 'mysql://root:admin@192.168.1.237/hn2'
 
 
