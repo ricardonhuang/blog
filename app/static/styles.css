@@ -25,7 +25,6 @@ div.post-date {
 div.post-author {
     font-weight: bold;
 	margin-left: 48px;
-    min-height: 5px;
 }
 div.post-thumbnail {
     position: absolute;
@@ -33,5 +32,9 @@ div.post-thumbnail {
 }
 div.post-body {
     margin-left: 48px;
-    min-height: 48px;
+    min-height: 30px;
 }
+div.pagination{
+	 margin-left:600px;
+     min-height: 30px;
+ }
