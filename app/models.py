@@ -11,6 +11,9 @@ from flask_login import UserMixin, AnonymousUserMixin
 from . import db, login_manager
 from datetime import datetime
 import hashlib
+from markdown import markdown
+import bleach
+
 
 class Permission:
     FOLLOW = 0x01
@@ -18,7 +21,16 @@ class Permission:
     WRITE_ARTICLES = 0x04
     MODERATE_COMMENTS = 0x08
     ADMINISTER = 0x80
-
+    
+    
+class Follow(db.Model):
+    __tablename__ = 'follows'
+    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'),
+                            primary_key=True)
+    followed_id = db.Column(db.Integer, db.ForeignKey('users.id'),
+                            primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+        
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -34,6 +46,17 @@ class User(UserMixin, db.Model):
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     posts = db.relationship('Post', backref='author', lazy='dynamic')
+    followed = db.relationship('Follow',
+                               foreign_keys=[Follow.follower_id],
+                               backref=db.backref('follower', lazy='joined'),
+                               lazy='dynamic',
+                               cascade='all, delete-orphan')
+    followers = db.relationship('Follow',
+                                foreign_keys=[Follow.followed_id],
+                                backref=db.backref('followed', lazy='joined'),
+                                lazy='dynamic',
+                                cascade='all, delete-orphan')
+    
     
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -150,7 +173,24 @@ class User(UserMixin, db.Model):
                 db.session.commit()
             except IntegrityError:
                 db.session.rollback()
+                
+                
+    def follow(self, user):
+        if not self.is_following(user):
+            f = Follow(follower=self, followed=user)
+            db.session.add(f)
+
+    def unfollow(self, user):
+        f = self.followed.filter_by(followed_id=user.id).first()
+        if f:
+            db.session.delete(f)
+    
+    def is_following(self, user):
+        return self.followed.filter_by(followed_id=user.id).first() is not None
         
+    def is_followed_by(self, user):
+        return self.followers.filter_by(follower_id=user.id).first() is not None
+
 
 class Post(db.Model):
     __tablename__ = 'posts'
@@ -158,7 +198,7 @@ class Post(db.Model):
     body = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    
+    body_html = db.Column(db.Text)
     
     @staticmethod
     def generate_fake(count=100):
@@ -173,8 +213,18 @@ class Post(db.Model):
                      author=u)
             db.session.add(p)
             db.session.commit()
+    
+    
+    @staticmethod
+    def on_changed_body(target, value, oldvalue, initiator):
+        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
+                        'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
+                        'h1', 'h2', 'h3', 'p']
+        target.body_html = bleach.linkify(bleach.clean(
+            markdown(value, output_format='html'),
+            tags=allowed_tags, strip=True))
 
-
+db.event.listen(Post.body, 'set', Post.on_changed_body)
 
 class Role(db.Model):
     __tablename__ = 'roles'
