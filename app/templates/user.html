@@ -49,6 +49,7 @@
 		{% if current_user.is_authenticated and user != current_user and user.is_following(current_user) %}
 		   | <span class="label label-default">Follows you</span>
 		{% endif %}
+		
 	</div>
 	<h3>Posts by {{ user.username }}</h3>
 	{% include '_posts.html' %}
