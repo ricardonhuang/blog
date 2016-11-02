@@ -14,6 +14,8 @@ from .. import db
 from ..decorators import admin_required,permission_required
 
 
+'''首页视图路由，注册登录用户可发post,可选择显示所有post或者关注者post'''
+
 @main.route('/', methods=['GET', 'POST'])
 def index():
     form = PostForm()
