@@ -28,7 +28,7 @@ class DevelopmentConfig(Config):
     MAIL_PORT = 25
     MAIL_USE_TLS = True
     MAIL_USERNAME = 'xyz1234h@126.com'#os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = 'hnling2010'#os.environ.get('MAIL_PASSWORD')
+    MAIL_PASSWORD = 'xxxxxxxx'#os.environ.get('MAIL_PASSWORD')
     SQLALCHEMY_DATABASE_URI = 'mysql://root:admin@192.168.1.237/hn2'
 
 
